@@ -191,8 +191,9 @@ function actualizarBannerFavorito() {
 // ==========================================
 
 async function obtenerHoroscopoAPI(signoEn) {
-    // Primero intentamos con la API principal
+    // Intentar con proxy local primero, luego API directa
     const apis = [
+        `/api/horoscope?sign=${signoEn}&day=TODAY`,
         `https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${signoEn}&day=TODAY`,
     ];
 
@@ -232,7 +233,10 @@ async function verificarConexionAPI() {
     const statusText = document.getElementById('apiStatusText');
 
     try {
-        const response = await fetch('https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=aries&day=TODAY', {
+        // Desactivado por CORS - usar solo datos locales
+        throw new Error('API desactivada por CORS');
+        
+        // const response = await fetch('/api/horoscope?sign=aries&day=TODAY', {
             mode: 'cors',
             headers: {
                 'Accept': 'application/json',
