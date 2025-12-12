@@ -290,6 +290,11 @@ async function verificarConexionAPI() {
                 statusDot.className = 'api-status-dot online';
                 statusText.textContent = 'API conectada';
                 apiOnline = true;
+
+                // Ocultar el indicador después de 3 segundos
+                setTimeout(() => {
+                    document.getElementById('apiStatus').style.display = 'none';
+                }, 3000);
                 return;
             }
         }
