@@ -118,8 +118,7 @@ const fasesLunares = [
     { fase: "Luna Menguante", icono: "🌘", descripcion: "Descanso y reflexión" }
 ];
 
-// Cache para horóscopos de API
-let horoscopoCache = {};
+// Estado de conexión a la API
 let apiOnline = false;
 
 // ==========================================
@@ -202,7 +201,7 @@ async function obtenerHoroscopoAPI(signoEn) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-            const response = await fetch(url, { 
+            const response = await fetch(url, {
                 signal: controller.signal,
                 mode: 'cors',
                 headers: {
@@ -232,29 +231,11 @@ async function verificarConexionAPI() {
     const statusDot = document.getElementById('apiStatusDot');
     const statusText = document.getElementById('apiStatusText');
 
-    try {
-        // Desactivado por CORS - usar solo datos locales
-        throw new Error('API desactivada por CORS');
-        
-        // const response = await fetch('/api/horoscope?sign=aries&day=TODAY', {
-            mode: 'cors',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        });
-        if (response.ok) {
-            statusDot.className = 'api-status-dot online';
-            statusText.textContent = 'API conectada';
-            apiOnline = true;
-        } else {
-            throw new Error('API no disponible');
-        }
-    } catch (error) {
-        statusDot.className = 'api-status-dot offline';
-        statusText.textContent = 'Modo offline';
-        apiOnline = false;
-    }
+    // API desactivada por CORS - usar solo datos locales
+    // Para habilitar, configurar el proxy-server.js o usar una API con CORS habilitado
+    statusDot.className = 'api-status-dot offline';
+    statusText.textContent = 'Modo offline';
+    apiOnline = false;
 }
 
 // ==========================================
@@ -263,6 +244,7 @@ async function verificarConexionAPI() {
 
 function crearEstrellas() {
     const container = document.getElementById('starsContainer');
+    const fragment = document.createDocumentFragment();
     const numStars = 200;
 
     for (let i = 0; i < numStars; i++) {
@@ -272,7 +254,7 @@ function crearEstrellas() {
         star.style.top = `${Math.random() * 100}%`;
         star.style.setProperty('--delay', `${Math.random() * 3}s`);
         star.style.setProperty('--duration', `${1.5 + Math.random() * 2}s`);
-        container.appendChild(star);
+        fragment.appendChild(star);
     }
 
     // Estrellas fugaces
@@ -282,8 +264,11 @@ function crearEstrellas() {
         shootingStar.style.top = `${Math.random() * 50}%`;
         shootingStar.style.left = `${Math.random() * 50}%`;
         shootingStar.style.animationDelay = `${i * 5 + Math.random() * 5}s`;
-        container.appendChild(shootingStar);
+        fragment.appendChild(shootingStar);
     }
+
+    // Insertar todos los elementos de una sola vez
+    container.appendChild(fragment);
 }
 
 function mostrarFecha() {
@@ -692,17 +677,29 @@ function inicializarNavegacion() {
     document.getElementById('shareBtn').addEventListener('click', () => {
         compartirHoroscopo('Horóscopo Diario');
     });
+
+    // Botón de leer horóscopo del signo favorito
+    const readFavoriteBtn = document.getElementById('readFavoriteBtn');
+    if (readFavoriteBtn) {
+        readFavoriteBtn.addEventListener('click', () => {
+            const favIndex = obtenerSignoFavorito();
+            if (favIndex !== null) {
+                const signo = signosZodiacales[favIndex];
+                mostrarHoroscopo(signo, parseInt(favIndex));
+            }
+        });
+    }
 }
 
 // Cerrar modal al hacer click fuera
-document.getElementById('modalOverlay').addEventListener('click', function(e) {
+document.getElementById('modalOverlay').addEventListener('click', function (e) {
     if (e.target === this) {
         cerrarModal();
     }
 });
 
 // Cerrar modal con ESC
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
         cerrarModal();
     }

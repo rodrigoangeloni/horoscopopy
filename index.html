@@ -125,10 +125,10 @@
                 Horóscopo PY
             </a>
             <div class="nav-links">
-                <button class="nav-btn" id="refreshBtn">
+                <button class="nav-btn" id="refreshBtn" aria-label="Actualizar horóscopos">
                     🔄 Actualizar
                 </button>
-                <button class="nav-btn" id="shareBtn">
+                <button class="nav-btn" id="shareBtn" aria-label="Compartir página">
                     📤 Compartir
                 </button>
             </div>
@@ -162,27 +162,27 @@
                     <p>Tenés un horóscopo nuevo esperándote</p>
                 </div>
             </div>
-            <button class="favorite-btn" id="readFavoriteBtn">
+            <button class="favorite-btn" id="readFavoriteBtn" aria-label="Leer mi horóscopo de signo favorito">
                 ✨ Leer mi horóscopo
             </button>
         </div>
 
         <!-- Tabs de navegación -->
-        <div class="tabs-container">
-            <button class="tab-btn active" data-tab="signos">
+        <div class="tabs-container" role="tablist" aria-label="Secciones de contenido">
+            <button class="tab-btn active" data-tab="signos" role="tab" aria-selected="true" aria-controls="signosSection">
                 ⭐ Signos
             </button>
-            <button class="tab-btn" data-tab="compatibilidad">
+            <button class="tab-btn" data-tab="compatibilidad" role="tab" aria-selected="false" aria-controls="compatibilidadSection">
                 💕 Compatibilidad
             </button>
-            <button class="tab-btn" data-tab="tarot">
+            <button class="tab-btn" data-tab="tarot" role="tab" aria-selected="false" aria-controls="tarotSection">
                 🃏 Tarot del Día
             </button>
         </div>
 
         <!-- Sección: Signos -->
-        <section class="content-section active" id="signosSection">
-            <div class="signs-grid" id="signsGrid"></div>
+        <section class="content-section active" id="signosSection" role="tabpanel" aria-labelledby="signos-tab">
+            <div class="signs-grid" id="signsGrid" role="list" aria-label="Signos del zodíaco"></div>
         </section>
 
         <!-- Sección: Compatibilidad -->
@@ -219,7 +219,7 @@
                     <h3 id="tarotCardName"></h3>
                     <p id="tarotCardMeaning"></p>
                 </div>
-                <button class="draw-again-btn" id="drawAgainBtn" style="display: none;">
+                <button class="draw-again-btn" id="drawAgainBtn" style="display: none;" aria-label="Sacar otra carta de tarot">
                     🔄 Sacar otra carta
                 </button>
             </div>
