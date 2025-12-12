@@ -291,10 +291,15 @@ async function verificarConexionAPI() {
                 statusText.textContent = 'API conectada';
                 apiOnline = true;
 
-                // Ocultar el indicador después de 3 segundos
+                // Ocultar el indicador después de 5 segundos con animación suave
                 setTimeout(() => {
-                    document.getElementById('apiStatus').style.display = 'none';
-                }, 3000);
+                    const apiStatus = document.getElementById('apiStatus');
+                    apiStatus.style.transition = 'opacity 0.5s ease-out';
+                    apiStatus.style.opacity = '0';
+                    setTimeout(() => {
+                        apiStatus.style.display = 'none';
+                    }, 500);
+                }, 5000);
                 return;
             }
         }
