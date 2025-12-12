@@ -186,6 +186,32 @@ function actualizarBannerFavorito() {
 }
 
 // ==========================================
+// FUNCIONES DE TRADUCCIÓN
+// ==========================================
+
+async function traducirTexto(texto, deLang = 'en', aLang = 'es') {
+    try {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=${deLang}|${aLang}`;
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.responseStatus === 200 && data.responseData?.translatedText) {
+                return data.responseData.translatedText;
+            }
+        }
+    } catch (error) {
+        console.log('Error en traducción:', error.message);
+    }
+    return texto; // Devolver texto original si falla
+}
+
+// ==========================================
 // FUNCIONES DE API
 // ==========================================
 
@@ -210,8 +236,10 @@ async function obtenerHoroscopoAPI(signoEn) {
         if (response.ok) {
             const data = await response.json();
             if (data.horoscope) {
+                // Traducir el horóscopo de inglés a español
+                const textoTraducido = await traducirTexto(data.horoscope, 'en', 'es');
                 return {
-                    texto: data.horoscope,
+                    texto: textoTraducido,
                     fuente: 'Astrology.com'
                 };
             }
