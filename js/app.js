@@ -190,14 +190,32 @@ function actualizarBannerFavorito() {
 // ==========================================
 
 async function traducirTexto(texto, deLang = 'en', aLang = 'es') {
+    console.log('🔄 Iniciando traducción...', texto.substring(0, 50));
+
+    // Si el texto es mayor a 450 caracteres, dividirlo en oraciones
+    if (texto.length > 450) {
+        // Regex para dividir por oraciones, manteniendo los signos de puntuación con la oración
+        const oraciones = texto.match(/[^.!?]+[.!?]*/g) || [texto];
+        let textoTraducido = '';
+
+        for (const oracion of oraciones) {
+            if (oracion.trim()) {
+                const traduccion = await traducirFragmento(oracion.trim(), deLang, aLang);
+                textoTraducido += traduccion + ' ';
+            }
+        }
+        console.log('✅ Texto largo traducido por partes');
+        return textoTraducido.trim();
+    }
+
+    return await traducirFragmento(texto, deLang, aLang);
+}
+
+async function traducirFragmento(texto, deLang, aLang) {
     try {
         const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=${deLang}|${aLang}`;
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-        const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeoutId);
+        const response = await fetch(url);
 
         if (response.ok) {
             const data = await response.json();
@@ -206,9 +224,9 @@ async function traducirTexto(texto, deLang = 'en', aLang = 'es') {
             }
         }
     } catch (error) {
-        console.log('Error en traducción:', error.message);
+        console.log('❌ Error en traducción:', error.message);
     }
-    return texto; // Devolver texto original si falla
+    return texto;
 }
 
 // ==========================================
@@ -218,12 +236,11 @@ async function traducirTexto(texto, deLang = 'en', aLang = 'es') {
 async function obtenerHoroscopoAPI(signoEn) {
     // API de Ohmanda via proxy CORS
     const apiUrl = `https://ohmanda.com/api/horoscope/${signoEn}/`;
-    // Usar proxy CORS público
     const url = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
 
         const response = await fetch(url, {
             signal: controller.signal,
@@ -237,6 +254,7 @@ async function obtenerHoroscopoAPI(signoEn) {
             const data = await response.json();
             if (data.horoscope) {
                 // Traducir el horóscopo de inglés a español
+                console.log('🔄 Horóscopo obtenido, traduciendo...');
                 const textoTraducido = await traducirTexto(data.horoscope, 'en', 'es');
                 return {
                     texto: textoTraducido,
@@ -267,12 +285,15 @@ async function verificarConexionAPI() {
         clearTimeout(timeoutId);
 
         if (response.ok) {
-            statusDot.className = 'api-status-dot online';
-            statusText.textContent = 'API conectada';
-            apiOnline = true;
-        } else {
-            throw new Error('API no disponible');
+            const data = await response.json();
+            if (data.horoscope) {
+                statusDot.className = 'api-status-dot online';
+                statusText.textContent = 'API conectada';
+                apiOnline = true;
+                return;
+            }
         }
+        throw new Error('API no disponible');
     } catch (error) {
         statusDot.className = 'api-status-dot offline';
         statusText.textContent = 'Modo offline';
