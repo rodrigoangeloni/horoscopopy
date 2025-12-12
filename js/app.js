@@ -190,12 +190,14 @@ function actualizarBannerFavorito() {
 // ==========================================
 
 async function obtenerHoroscopoAPI(signoEn) {
-    // API de Ohmanda - tiene CORS habilitado
-    const url = `https://ohmanda.com/api/horoscope/${signoEn}/`;
+    // API de Ohmanda via proxy CORS
+    const apiUrl = `https://ohmanda.com/api/horoscope/${signoEn}/`;
+    // Usar proxy CORS público
+    const url = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
 
         const response = await fetch(url, {
             signal: controller.signal,
@@ -226,9 +228,12 @@ async function verificarConexionAPI() {
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-        const response = await fetch('https://ohmanda.com/api/horoscope/aries/', {
+        const apiUrl = 'https://ohmanda.com/api/horoscope/aries/';
+        const url = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+
+        const response = await fetch(url, {
             signal: controller.signal
         });
         clearTimeout(timeoutId);
