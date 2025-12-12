@@ -190,39 +190,32 @@ function actualizarBannerFavorito() {
 // ==========================================
 
 async function obtenerHoroscopoAPI(signoEn) {
-    // Intentar con proxy local primero, luego API directa
-    const apis = [
-        `/api/horoscope?sign=${signoEn}&day=TODAY`,
-        `https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${signoEn}&day=TODAY`,
-    ];
+    // API de Ohmanda - tiene CORS habilitado
+    const url = `https://ohmanda.com/api/horoscope/${signoEn}/`;
 
-    for (const url of apis) {
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-            const response = await fetch(url, {
-                signal: controller.signal,
-                mode: 'cors',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            });
-            clearTimeout(timeoutId);
-
-            if (response.ok) {
-                const data = await response.json();
-                if (data.data?.horoscope_data) {
-                    return {
-                        texto: data.data.horoscope_data,
-                        fuente: 'API Horoscope'
-                    };
-                }
+        const response = await fetch(url, {
+            signal: controller.signal,
+            headers: {
+                'Accept': 'application/json'
             }
-        } catch (error) {
-            console.log('API no disponible, usando datos locales');
+        });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.horoscope) {
+                return {
+                    texto: data.horoscope,
+                    fuente: 'Astrology.com'
+                };
+            }
         }
+    } catch (error) {
+        console.log('API no disponible:', error.message);
     }
     return null;
 }
@@ -231,11 +224,27 @@ async function verificarConexionAPI() {
     const statusDot = document.getElementById('apiStatusDot');
     const statusText = document.getElementById('apiStatusText');
 
-    // API desactivada por CORS - usar solo datos locales
-    // Para habilitar, configurar el proxy-server.js o usar una API con CORS habilitado
-    statusDot.className = 'api-status-dot offline';
-    statusText.textContent = 'Modo offline';
-    apiOnline = false;
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const response = await fetch('https://ohmanda.com/api/horoscope/aries/', {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+            statusDot.className = 'api-status-dot online';
+            statusText.textContent = 'API conectada';
+            apiOnline = true;
+        } else {
+            throw new Error('API no disponible');
+        }
+    } catch (error) {
+        statusDot.className = 'api-status-dot offline';
+        statusText.textContent = 'Modo offline';
+        apiOnline = false;
+    }
 }
 
 // ==========================================
