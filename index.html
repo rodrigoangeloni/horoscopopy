@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Horóscopo diario para Paraguay. Consultá tu signo zodiacal y descubrí lo que las estrellas tienen para vos hoy.">
+    <meta name="keywords" content="horóscopo, zodíaco, astrología, Paraguay, predicciones, signos zodiacales">
+    <title>✨ Horóscopo Diario Paraguay - Tu Destino en las Estrellas</title>
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+
+    <!-- Estilos críticos para el loader -->
+    <style>
+        :root {
+            --primary-gold: #ffd700;
+            --primary-purple: #a78bfa;
+            --darker-bg: #050510;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: var(--darker-bg);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== LOADER INICIAL ===== */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-crystal {
+            font-size: 4rem;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        .loader-text {
+            margin-top: 20px;
+            font-family: 'Cinzel', serif;
+            color: var(--primary-gold);
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+        }
+
+        .loader-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .loader-dots span {
+            width: 10px;
+            height: 10px;
+            background: var(--primary-purple);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .loader-dots span:nth-child(1) { animation-delay: 0s; }
+        .loader-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loader-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+
+    <!-- Enlace al archivo CSS principal -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Loader inicial -->
+    <div class="page-loader" id="pageLoader">
+        <span class="loader-crystal">🔮</span>
+        <p class="loader-text">CONECTANDO CON EL UNIVERSO</p>
+        <div class="loader-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <!-- Estrellas de fondo -->
+    <div class="stars-container" id="starsContainer"></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Contenedor Principal -->
+    <div class="main-container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <a href="#" class="nav-brand">
+                <span>🔮</span>
+                Horóscopo PY
+            </a>
+            <div class="nav-links">
+                <button class="nav-btn" id="refreshBtn">
+                    🔄 Actualizar
+                </button>
+                <button class="nav-btn" id="shareBtn">
+                    📤 Compartir
+                </button>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <span class="logo-icon">🔮</span>
+                <h1 class="logo">Horóscopo Diario</h1>
+                <p class="subtitle">✨ Descubrí lo que las estrellas tienen para vos hoy ✨</p>
+                <div class="date-moon-container">
+                    <div class="date-display">
+                        <span class="flag">🇵🇾</span>
+                        <span class="date-text" id="currentDate"></span>
+                    </div>
+                    <div class="moon-phase">
+                        <span class="moon-icon" id="moonIcon">🌙</span>
+                        <span class="moon-text" id="moonPhase">Cargando fase lunar...</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Banner signo favorito -->
+        <div class="favorite-sign-banner" id="favoriteBanner">
+            <div class="favorite-info">
+                <span class="favorite-icon" id="favoriteIcon">♈</span>
+                <div class="favorite-details">
+                    <h3>Tu signo: <span id="favoriteName">Aries</span></h3>
+                    <p>Tenés un horóscopo nuevo esperándote</p>
+                </div>
+            </div>
+            <button class="favorite-btn" id="readFavoriteBtn">
+                ✨ Leer mi horóscopo
+            </button>
+        </div>
+
+        <!-- Tabs de navegación -->
+        <div class="tabs-container">
+            <button class="tab-btn active" data-tab="signos">
+                ⭐ Signos
+            </button>
+            <button class="tab-btn" data-tab="compatibilidad">
+                💕 Compatibilidad
+            </button>
+            <button class="tab-btn" data-tab="tarot">
+                🃏 Tarot del Día
+            </button>
+        </div>
+
+        <!-- Sección: Signos -->
+        <section class="content-section active" id="signosSection">
+            <div class="signs-grid" id="signsGrid"></div>
+        </section>
+
+        <!-- Sección: Compatibilidad -->
+        <section class="content-section" id="compatibilidadSection">
+            <div class="compatibility-section">
+                <div class="compatibility-selector">
+                    <div class="sign-select-container">
+                        <label>Tu signo</label>
+                        <select class="sign-select" id="sign1Select"></select>
+                    </div>
+                    <span class="heart-icon">💕</span>
+                    <div class="sign-select-container">
+                        <label>Su signo</label>
+                        <select class="sign-select" id="sign2Select"></select>
+                    </div>
+                </div>
+                <div class="compatibility-result" id="compatibilityResult">
+                    <div class="compatibility-meter" id="compatibilityMeter" style="--percentage: 0%;">
+                        <span class="compatibility-percentage" id="compatibilityPercentage">0%</span>
+                    </div>
+                    <p class="compatibility-description" id="compatibilityDescription"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Tarot -->
+        <section class="content-section" id="tarotSection">
+            <div class="tarot-section">
+                <p class="tarot-intro">
+                    Concentrate, pensá en tu pregunta y elegí una carta. El universo te dará una respuesta.
+                </p>
+                <div class="tarot-cards-container" id="tarotCards"></div>
+                <div class="tarot-message" id="tarotMessage">
+                    <h3 id="tarotCardName"></h3>
+                    <p id="tarotCardMeaning"></p>
+                </div>
+                <button class="draw-again-btn" id="drawAgainBtn" style="display: none;">
+                    🔄 Sacar otra carta
+                </button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-logo">
+                <span>🔮</span>
+                Horóscopo Diario PY
+            </div>
+            <p class="footer-text">🌟 Tu portal de astrología y predicciones diarias 🌟</p>
+            <p class="footer-text">Hecho con ❤️ para Paraguay por Rodrigo Angeloni</p>
+            <p class="footer-text" style="margin-top: 10px;">
+                Datos actualizados desde APIs astrológicas
+            </p>
+            <div class="social-links">
+                <span class="social-link" title="WhatsApp">💬</span>
+                <span class="social-link" title="Facebook">📘</span>
+                <span class="social-link" title="Instagram">📸</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- API Status -->
+    <div class="api-status" id="apiStatus">
+        <span class="api-status-dot loading" id="apiStatusDot"></span>
+        <span id="apiStatusText">Verificando conexión...</span>
+    </div>
+
+    <!-- Modal del horóscopo -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content" id="modalContent">
+            <div class="modal-glow"></div>
+            <!-- Contenido dinámico -->
+        </div>
+    </div>
+
+    <!-- Enlace al archivo JavaScript -->
+    <script src="js/app.js"></script>
+</body>
+</html>
